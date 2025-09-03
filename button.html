@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" href="https://www.stuff.tv/wp-content/uploads/sites/2/2023/09/OVERLAY-editors-choice-logo.png" type="image/png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catch the Button... If You Can!</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f0f8ff;
+      margin-top: 50px;
+      overflow: hidden; /* Prevents scrolling when button moves around */
+    }
+    h1 {
+      font-size: 2em;
+      color: #333;
+    }
+    p {
+      font-size: 1.2em;
+    }
+    #button {
+      padding: 15px 30px;
+      font-size: 1.2em;
+      color: white;
+      background-color: #ff4500;
+      border: none;
+      border-radius: 8px;
+      position: absolute;
+      cursor: pointer;
+      transition: transform 0.1s ease;
+    }
+    #message {
+      margin-top: 20px;
+      font-size: 1.5em;
+      color: #ff4500;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <a href="https://gregorio-mcgreg.github.io/" class="button">go home</a>
+  <h1>Catch Me If You Can!</h1>
+  <p>Try to press the button!</p>
+  <button id="button" onclick="showMessage()">Can't Touch This!</button>
+  <p id="message"></p>
+
+  <script>
+    const button = document.getElementById("button");
+    const message = document.getElementById("message");
+    const buttonWidth = button.offsetWidth;
+    const buttonHeight = button.offsetHeight;
+    let isButtonClicked = false;
+
+    document.addEventListener("mousemove", (event) => {
+      if (!isButtonClicked) {
+        const mouseX = event.clientX;
+        const mouseY = event.clientY;
+        const buttonX = button.offsetLeft + buttonWidth / 2;
+        const buttonY = button.offsetTop + buttonHeight / 2;
+
+        // Calculate the distance between the mouse and the button center
+        const distanceX = mouseX - buttonX;
+        const distanceY = mouseY - buttonY;
+        const distance = Math.sqrt(distanceX ** 2 + distanceY ** 2);
+
+        // If the mouse is TOO close, teleport the button
+        if (distance < 150) {
+          const randomX = Math.random() * (window.innerWidth - buttonWidth);
+          const randomY = Math.random() * (window.innerHeight - buttonHeight);
+          button.style.left = `${randomX}px`;
+          button.style.top = `${randomY}px`;
+        } 
+        // Otherwise, smoothly move the button away
+        else {
+          const speed = 2000 / (distance + 1); // Closer = faster movement
+          const moveX = button.offsetLeft - (distanceX / distance) * speed;
+          const moveY = button.offsetTop - (distanceY / distance) * speed;
+
+          // Ensure the button stays within the window bounds
+          button.style.left = Math.max(0, Math.min(window.innerWidth - buttonWidth, moveX)) + "px";
+          button.style.top = Math.max(0, Math.min(window.innerHeight - buttonHeight, moveY)) + "px";
+        }
+      }
+    });
+
+    function showMessage() {
+      isButtonClicked = true; // Stop button movement
+      message.textContent = "How'd you do it?";
+    }
+  </script>
+
+</body>
+</html>
