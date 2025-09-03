@@ -1,0 +1,74 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" href="https://www.stuff.tv/wp-content/uploads/sites/2/2023/09/OVERLAY-editors-choice-logo.png" type="image/png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ship Checker</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+    .container {
+      max-width: 400px;
+      margin: auto;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      background-color: #fff;
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      font-size: 16px;
+    }
+    .result {
+      font-size: 18px;
+      font-weight: bold;
+      color: #333;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="https://gregorio-mcgreg.github.io/" class="button">go home</a>
+    <h1>Ship Compatibility Check</h1>
+    <p>Enter your names to find out if you're a perfect ship!!</p>
+    <form id="marriageForm" onsubmit="checkCompatibility(event)">
+      <input type="text" id="name1" placeholder="Name 1" required>
+      <input type="text" id="name2" placeholder="Name 2" required>
+      <button type="submit">Check Shipability</button>
+    </form>
+    <div class="result" id="result"></div>
+  </div>
+
+  <script>
+    function checkCompatibility(event) {
+      event.preventDefault();
+      
+      const name1 = document.getElementById("name1").value;
+      const name2 = document.getElementById("name2").value;
+      const result = document.getElementById("result");
+      
+      if (!name1 || !name2) {
+        result.innerText = "Please enter both names.";
+        return;
+      }
+
+      // Simple "compatibility" checker (randomized for demo purposes)
+      const compatible = Math.random() > 0.5;
+
+      if (compatible) {
+        result.innerText = `${name1} and ${name2} are a perfect ship! ❤️`;
+      } else {
+        result.innerText = `${name1} and ${name2} wouldn't do well together!`;
+      }
+    }
+  </script>
+</body>
+</html>
