@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="https://www.stuff.tv/wp-content/uploads/sites/2/2023/09/OVERLAY-editors-choice-logo.png" type="image/png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claire Clicker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f7e4c6;
+        }
+        #cookie {
+            width: 150px;
+            height: 150px;
+            cursor: pointer;
+        }
+        #score {
+            font-size: 24px;
+            margin: 20px;
+        }
+        button {
+            font-size: 16px;
+            padding: 10px;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <a href="https://gregorio-mcgreg.github.io/" class="button">go home</a>
+    <h1>Claire Clicker</h1>
+    <p id="score">Claires: 0</p>
+    <img id="cookie" src="https://www.mcdonogh.org/images/students/2023/46883.jpg" alt="Cookie">
+    <br>
+    <button id="autoClicker">Buy Auto Clicker 1 for 10 Claires</button>
+    <br>
+    <button id="clickUpgrade">Upgrade Click Power to Click Power 1 for 15 Claires</button>
+    <br>
+    <button id="speedUpgrade">Upgrade Auto Clicker Speed for 100 Claires</button>
+
+
+    <script>
+        let cookies = 0;
+        let autoClickerCost = 10;
+        let autoClickers = 0;
+        let clickPower = 1;
+        let clickUpgradeCost = 15;
+        let speedUpgradeCost = 100;
+        let autoClickSpeed = 1000;
+
+        const cookieElement = document.getElementById("cookie");
+        const scoreElement = document.getElementById("score");
+        const autoClickerButton = document.getElementById("autoClicker");
+        const clickUpgradeButton = document.getElementById("clickUpgrade");
+        const speedUpgradeButton = document.getElementById("speedUpgrade");
+
+        cookieElement.addEventListener("click", () => {
+            cookies += clickPower;
+            updateScore();
+        });
+
+        autoClickerButton.addEventListener("click", () => {
+            if (cookies >= autoClickerCost) {
+                cookies -= autoClickerCost;
+                autoClickers++;
+                autoClickerCost = Math.floor(autoClickerCost * 6);
+                autoClickerButton.textContent = `Buy Auto Clicker ${autoClickers + 1} for ${autoClickerCost} Claires`;
+                updateScore();
+            }
+        });
+
+        clickUpgradeButton.addEventListener("click", () => {
+            if (cookies >= clickUpgradeCost) {
+                cookies -= clickUpgradeCost;
+                clickPower++;
+                clickUpgradeCost = Math.floor(clickUpgradeCost * 3);
+                clickUpgradeButton.textContent = `Upgrade Click Power to Click Power ${clickPower + 1} for ${clickUpgradeCost} Claires`;
+                updateScore();
+            }
+        });
+
+        speedUpgradeButton.addEventListener("click", () => {
+            if (cookies >= speedUpgradeCost) {
+                cookies -= speedUpgradeCost;
+                autoClickSpeed = Math.max(200, autoClickSpeed * 0.75);
+                speedUpgradeCost = Math.floor(speedUpgradeCost * 12);
+                speedUpgradeButton.textContent = `Upgrade Auto Clicker Speed for ${speedUpgradeCost} Claires`;
+                restartAutoClicker();
+                updateScore();
+            }
+        });
+
+        function updateScore() {
+            scoreElement.textContent = `Claires: ${cookies}`;
+        }
+
+        let autoClickerInterval = setInterval(() => {
+            cookies += autoClickers * 9;
+            updateScore();
+        }, autoClickSpeed);
+
+        function restartAutoClicker() {
+            clearInterval(autoClickerInterval);
+            autoClickerInterval = setInterval(() => {
+                cookies += autoClickers;
+                updateScore();
+            }, autoClickSpeed);
+        }
+    </script>
+</body>
+</html>
