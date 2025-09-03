@@ -1,0 +1,91 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Face Recognition</title>
+    <link rel="icon" href="https://www.stuff.tv/wp-content/uploads/sites/2/2023/09/OVERLAY-editors-choice-logo.png" type="image/png">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #111;
+            color: white;
+            margin: 0;
+            padding: 20px;
+        }
+        #video {
+            width: 80%;
+            max-width: 400px;
+            border: 2px solid white;
+            border-radius: 10px;
+            display: block;
+            margin: auto;
+        }
+        #capture-btn, #process-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            background-color: red;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        #result {
+            font-size: 20px;
+            margin-top: 20px;
+            color: lime;
+        }
+    </style>
+</head>
+<body>
+    <a href="https://gregorio-mcgreg.github.io/" class="button">go home</a>
+    
+    <h1>AI Facial Recognition System</h1>
+    <p>Click the button to capture your image and let the AI identify you.</p>
+
+    <video id="video" autoplay></video>
+    <button id="capture-btn">Take Picture</button>
+    <button id="process-btn" style="display: none;">Process Image</button>
+    
+    <canvas id="canvas" style="display: none;"></canvas>
+
+    <p id="result"></p>
+
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const captureBtn = document.getElementById('capture-btn');
+        const processBtn = document.getElementById('process-btn');
+        const result = document.getElementById('result');
+
+        // Access webcam
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => { video.srcObject = stream; })
+            .catch(err => { console.error("Error accessing webcam:", err); });
+
+        // Capture image
+        captureBtn.addEventListener('click', () => {
+            const context = canvas.getContext('2d');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            captureBtn.style.display = "none";
+            processBtn.style.display = "inline-block";
+        });
+
+        // AI processing
+        processBtn.addEventListener('click', () => {
+            result.innerHTML = "Processing image... (This may take a few seconds)";
+            setTimeout(() => {
+                result.innerHTML = "<strong>Hello Donald Trump. The nukes have been activated, Mr. President.</strong>";
+                result.style.color = "red";
+            }, 3000);
+        });
+    </script>
+
+</body>
+</html>
