@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <link rel="icon" href="https://www.stuff.tv/wp-content/uploads/sites/2/2023/09/OVERLAY-editors-choice-logo.png" type="image/png">
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Guess Password</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                margin: 0;
+                background-color: #f0f0f0;
+            }
+            .login-container {
+                background-color: white;
+                padding: 20px;
+                border-radius: 8px;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            }
+            .login-container h2 {
+                margin-bottom: 20px;
+            }
+            .login-container input {
+                display: block;
+                width: 100%;
+                padding: 10px;
+                margin: 10px 0;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+            }
+            .login-container button {
+                width: 100%;
+                padding: 10px;
+                background-color: #007BFF;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+            }
+            .login-container button:hover {
+                background-color: #0056b3;
+            }
+            .banner {
+                display: none;
+                background-color: red;
+                color: white;
+                padding: 10px;
+                text-align: center;
+                border-radius: 4px;
+                margin-top: 10px;
+            }
+        </style>
+
+    </head>
+    <body>
+
+        <div class="login-container">
+            <a href="https://gregorio-mcgreg.github.io/index.html" class="button">go home</a>
+            <h2>Login</h2>
+            <input type="text" id="username" placeholder="Username">
+            <input type="password" id="password" placeholder="Password">
+            <button onclick="handleLogin()">Log In</button>
+            <div class="banner" id="errorBanner">Password Incorrect</div>
+        </div>
+
+        <script>
+            function handleLogin() {
+                // Clear input fields
+                document.getElementById('username').value = '';
+                document.getElementById('password').value = '';
+            
+                // Show error banner
+                const banner = document.getElementById('errorBanner');
+                banner.style.display = 'block';
+            
+                // Hide banner after 3 seconds
+                setTimeout(() => {
+                    banner.style.display = 'none';
+                }, 3000);
+            }
+        </script>
+
+    </body>
+</html>
