@@ -36,9 +36,11 @@
     <br>
     <button id="autoClicker">Buy Auto Clicker 1 for 10 Cookies</button>
     <br>
-    <button id="clickUpgrade">Upgrade Click Power to Click Power 1 for 15 Cookies</button>
+    <button id="clickUpgrade">Upgrade Click Power to Click Power 2 for 15 Cookies</button>
     <br>
     <button id="speedUpgrade">Upgrade Auto Clicker Speed for 100 Cookies</button>
+    <br>
+    <p id="noMoneyText"></p>
 
     <script>
         let cookies = 0;
@@ -48,12 +50,14 @@
         let clickUpgradeCost = 15;
         let speedUpgradeCost = 100;
         let autoClickSpeed = 1000;
+        let autoClickSpeedTier = 0;
 
         const cookieElement = document.getElementById("cookie");
         const scoreElement = document.getElementById("score");
         const autoClickerButton = document.getElementById("autoClicker");
         const clickUpgradeButton = document.getElementById("clickUpgrade");
         const speedUpgradeButton = document.getElementById("speedUpgrade");
+        const noMoneyText = document.getElementById("noMoneyText");
 
         cookieElement.addEventListener("click", () => {
             cookies += clickPower;
@@ -67,6 +71,11 @@
                 autoClickerCost = Math.floor(autoClickerCost * 6);
                 autoClickerButton.textContent = `Buy Auto Clicker ${autoClickers + 1} for ${autoClickerCost} Cookies`;
                 updateScore();
+            } else {
+                noMoneyText.textContent = "You don't have enough Money for that";
+                setTimeout(() => {
+                        noMoneyText.textContent = "";
+                        }, 1500);
             }
         });
 
@@ -83,9 +92,10 @@
         speedUpgradeButton.addEventListener("click", () => {
             if (cookies >= speedUpgradeCost) {
                 cookies -= speedUpgradeCost;
+                autoClickSpeedTier += 1;
                 autoClickSpeed = Math.max(200, autoClickSpeed * 0.75);
                 speedUpgradeCost = Math.floor(speedUpgradeCost * 12);
-                speedUpgradeButton.textContent = `Upgrade Auto Clicker Speed for ${speedUpgradeCost} Cookies`;
+                speedUpgradeButton.textContent = `Upgrade Auto Clicker Speed to Clicker Speed ${autoClickerSpeedTier} for ${speedUpgradeCost} Cookies`;
                 restartAutoClicker();
                 updateScore();
             }
