@@ -86,6 +86,11 @@
                 clickUpgradeCost = Math.floor(clickUpgradeCost * 3);
                 clickUpgradeButton.textContent = `Upgrade Click Power to Click Power ${clickPower + 1} for ${clickUpgradeCost} Cookies`;
                 updateScore();
+            } else {
+                noMoneyText.textContent = "You don't have enough Money for that";
+                setTimeout(() => {
+                        noMoneyText.textContent = "";
+                        }, 1500);
             }
         });
 
@@ -98,6 +103,11 @@
                 speedUpgradeButton.textContent = `Upgrade Auto Clicker Speed to Clicker Speed ${autoClickerSpeedTier} for ${speedUpgradeCost} Cookies`;
                 restartAutoClicker();
                 updateScore();
+            } else {
+                noMoneyText.textContent = "You don't have enough Money for that";
+                setTimeout(() => {
+                        noMoneyText.textContent = "";
+                        }, 1500);
             }
         });
 
