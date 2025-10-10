@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Colby's Crush</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 50px;
+    }
+
+    input, button {
+      padding: 10px;
+      font-size: 16px;
+    }
+
+    #output {
+      margin-top: 20px;
+      font-size: 20px;
+      color: darkgreen;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Colby's Crush</h1>
+  <p>Enter your guess for Colby's password. If you are right, Colby's crush will apear. If you are wrong, gibberish will be shown. Note: there is a theoretical password for the name of everyone on Earth, so if you look at the code you won't find anything. However, I will assure you: Colby's actual crush has a normal password. For example, a normal password might be: "Claire_asks_about_colbys_crush_too_much_1234."</p>
+  
+  <input type="text" id="wordInput" placeholder="Enter a guess" />
+  <button onclick="transformWord()">Transform</button>
+
+  <div id="output"></div>
+
+  <script>
+    function transformWord() {
+      const input = document.getElementById("wordInput").value;
+      let result = "";
+
+      for (let i = 0; i < input.length; i++) {
+        let char = input[i];
+        let code = input.charCodeAt(i);
+
+        // Only transform letters
+        if (char.match(/[a-zA-Z]/)) {
+          let isUpper = (code >= 65 && code <= 90);
+          let base = isUpper ? 65 : 97;
+
+          // Shift amount increases with position (e.g., 3, 5, 7, ...)
+          let shift = 3 + (i * 2);
+
+          let newChar = String.fromCharCode(
+            ((code - base + shift) % 26) + base
+          );
+
+          result += newChar;
+        } else {
+          // Keep non-letters the same
+          result += char;
+        }
+      }
+
+      document.getElementById("output").innerText = `Output: ${result}`;
+    }
+  </script>
+
+</body>
+</html>
