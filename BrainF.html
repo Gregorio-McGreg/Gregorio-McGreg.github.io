@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <link rel="icon" href="https://www.stuff.tv/wp-content/uploads/sites/2/2023/09/OVERLAY-editors-choice-logo.png" type="image/png">
+
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Brainfuck Grid Runner</title>
+<style>
+  :root{
+    --cell-size:48px;
+    --gap:6px;
+    --font: 13px/1.1 system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+  }
+  body{font-family:var(--font); margin:18px; background:#0f1720; color:#e6eef6}
+  h1{font-size:18px;margin:0 0 12px}
+  .controls{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+  textarea{width:540px;height:110px;padding:8px;border-radius:6px;background:#071022;color:#dff; border:1px solid #24313f;resize:vertical}
+  .panel{background:#071022;border:1px solid #24313f;padding:12px;border-radius:10px}
+  button{background:#1f6feb;border:none;color:white;padding:8px 10px;border-radius:8px;cursor:pointer}
+  button.secondary{background:#334155}
+  .grid-wrap{overflow:auto;max-width:100%;padding:8px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:10px}
+  .grid{display:grid;gap:var(--gap);padding:10px}
+  .cell{width:var(--cell-size);height:var(--cell-size);display:flex;align-items:center;justify-content:center;border-radius:8px;position:relative;font-weight:700;box-shadow:inset 0 -2px 0 rgba(0,0,0,0.15);color:transparent}
+  .cell .num{position:absolute;left:0;top:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;font-size:12px;text-shadow:0 1px 0 rgba(0,0,0,0.6);color:rgba(0,0,0,0.9)}
+  .cell.pointer{outline:4px solid rgba(255,255,255,0.9);transform:scale(1.06)}
+  .status{margin-top:10px;display:flex;gap:14px;flex-wrap:wrap}
+  .small{font-size:13px;color:#cbd5e1}
+  .io{display:flex;flex-direction:column;gap:8px}
+  input[type=number]{width:76px;padding:6px;border-radius:6px;background:#071022;color:#dff;border:1px solid #24313f}
+  label{font-size:13px}
+  .info{font-size:13px;color:#9fb0c6}
+  .output{background:#00121a;padding:8px;border-radius:6px;min-height:28px;border:1px solid #123}
+  .footer{margin-top:10px;color:#9fb0c6;font-size:13px}
+  @media (max-width:900px){textarea{width:100%}}
+</style>
+</head>
+<body>
+  <a href="https://gregorio-mcgreg.github.io/" class="button">go home</a>
+<h1>Brainfuck Grid Runner — memory visualized as a colored grid</h1>
+<div style="display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap">
+  <div style="flex:0 1 560px">
+    <div class="panel">
+      <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap">
+        <button id="runBtn">Run</button>
+        <button id="pauseBtn" class="secondary">Pause</button>
+        <button id="stepBtn" class="secondary">Step</button>
+        <button id="resetBtn" class="secondary">Reset</button>
+        <label class="small">Speed <input id="speedRange" type="range" min="1" max="500" value="60"> <span id="speedVal">60</span> ms</label>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap">
+        <label>Memory cells: <input id="memSize" type="number" min="8" max="4096" value="256"></label>
+        <label>Columns: <input id="cols" type="number" min="4" max="128" value="32"></label>
+        <label>Wrap pointer: <input id="wrapPtr" type="checkbox" checked></label>
+        <label>Cell display: <select id="colorMode"><option value="hue">Hue (color wheel)</option><option value="grayscale">Grayscale</option><option value="heat">Heat (blue→red)</option></select></label>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <textarea id="code" placeholder="Enter Brainfuck code here">++++++++[>++++++++<-]>.+.+.</textarea>
+        <div style="width:260px;display:flex;flex-direction:column;gap:8px">
+          <div class="io">
+            <label class="small">Input (consumed by ,)</label>
+            <input id="input" placeholder="Type input here">
+          </div>
+          <div class="io">
+            <label class="small">Output</label>
+            <div id="output" class="output"></div>
+          </div>
+          <div class="info" id="pcInfo">PC: 0</div>
+          <div class="info">Tip: Use '[' and ']' loops. Non brainfuck chars are ignored.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="flex:1 1 420px;min-width:320px">
+    <div class="panel grid-wrap">
+      <div style="display:flex;gap:12px;align-items:center;margin-bottom:10px;flex-wrap:wrap">
+        <div class="small">Pointer: <strong id="pointerIndex">0</strong></div>
+        <div class="small">Cell value: <strong id="cellValue">0</strong></div>
+        <div class="small">Instruction: <strong id="currCmd">—</strong></div>
+        <div class="small">Steps executed: <strong id="steps">0</strong></div>
+      </div>
+      <div id="grid" class="grid"></div>
+      <div class="footer">Click a cell to set the pointer there. Values 0–255 (wrap). Colors depend on chosen display mode.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  // Elements
+  const codeEl=document.getElementById('code');
+  const runBtn=document.getElementById('runBtn');
+  const pauseBtn=document.getElementById('pauseBtn');
+  const stepBtn=document.getElementById('stepBtn');
+  const resetBtn=document.getElementById('resetBtn');
+  const outputEl=document.getElementById('output');
+  const inputEl=document.getElementById('input');
+  const gridEl=document.getElementById('grid');
+  const pointerIndexEl=document.getElementById('pointerIndex');
+  const cellValueEl=document.getElementById('cellValue');
+  const currCmdEl=document.getElementById('currCmd');
+  const pcInfo=document.getElementById('pcInfo');
+  const stepsEl=document.getElementById('steps');
+  const memSizeEl=document.getElementById('memSize');
+  const colsEl=document.getElementById('cols');
+  const speedRange=document.getElementById('speedRange');
+  const speedVal=document.getElementById('speedVal');
+  const colorModeEl=document.getElementById('colorMode');
+  const wrapPtrEl=document.getElementById('wrapPtr');
+
+  let memSize=parseInt(memSizeEl.value,10);
+  let cols=parseInt(colsEl.value,10);
+  let memory=new Uint8Array(memSize);
+  let ptr=0;
+  let pc=0;
+  let steps=0;
+  let program='';
+  let bracketMap={};
+  let running=false;
+  let timer=null;
+  let inputBuffer='';
+  let outputBuffer='';
+
+  function makeGrid(){
+    gridEl.style.gridTemplateColumns=`repeat(${cols}, ${getComputedStyle(document.documentElement).getPropertyValue('--cell-size') || '48px'})`;
+    gridEl.innerHTML='';
+    for(let i=0;i<memSize;i++){
+      const d=document.createElement('div');
+      d.className='cell';
+      d.dataset.index=i;
+      const num=document.createElement('div'); num.className='num'; num.innerText='0';
+      d.appendChild(num);
+      d.addEventListener('click',()=>{
+        ptr=i; updateUI();
+      });
+      gridEl.appendChild(d);
+    }
+    updateAllCells();
+  }
+
+  function valueToColor(v){
+    const mode=colorModeEl.value;
+    const x = Math.max(0,Math.min(255, v));
+    if(mode==='grayscale'){
+      const L = Math.round((x/255)*100);
+      return `hsl(0 0% ${L}%)`;
+    }else if(mode==='heat'){
+      // blue (240) -> cyan -> yellow -> red (0)
+      const t = x/255;
+      const hue = 240 - t*240; // 240->0
+      return `hsl(${hue} 85% 50%)`;
+    } else {
+      const hue = Math.round((x/255)*360);
+      return `hsl(${hue} 85% 50%)`;
+    }
+  }
+
+  function updateAllCells(){
+    const cells=gridEl.children;
+    for(let i=0;i<cells.length;i++){
+      const val=memory[i];
+      const c=cells[i];
+      c.style.background=valueToColor(val);
+      c.querySelector('.num').innerText=val;
+      c.style.color=(val>180? 'black':'white');
+    }
+    highlightPointer();
+  }
+
+  function highlightPointer(){
+    const cells=gridEl.children;
+    for(let i=0;i<cells.length;i++){
+      const c=cells[i];
+      if(i===ptr){
+        c.classList.add('pointer');
+        pointerIndexEl.innerText=ptr;
+        cellValueEl.innerText=memory[ptr];
+      } else c.classList.remove('pointer');
+    }
+  }
+
+  function rebuild(){
+    memSize=parseInt(memSizeEl.value,10)||256;
+    cols=parseInt(colsEl.value,10)||32;
+    if(memSize<1) memSize=1;
+    if(cols<1) cols=1;
+    const old=memory;
+    const newMem=new Uint8Array(memSize);
+    newMem.set(old.subarray(0, Math.min(old.length, memSize)));
+    memory=newMem;
+    if(ptr>=memSize) ptr = memSize-1;
+    makeGrid();
+  }
+
+  memSizeEl.addEventListener('change',rebuild);
+  colsEl.addEventListener('change',rebuild);
+  colorModeEl.addEventListener('change',updateAllCells);
+
+  function preprocess(code){
+    const filtered = code.split('').filter(ch=>'+-<>.,[]'.includes(ch)).join('');
+    const map={};
+    const stack=[];
+    for(let i=0;i<filtered.length;i++){
+      const c=filtered[i];
+      if(c==='[') stack.push(i);
+      else if(c===']'){
+        const open=stack.pop();
+        if(open===undefined) throw new Error('Unmatched ] at '+i);
+        map[open]=i; map[i]=open;
+      }
+    }
+    if(stack.length) throw new Error('Unmatched [ at '+stack.pop());
+    return {filtered,map};
+  }
+
+  function reset(statePreserve=false){
+    if(!statePreserve){
+      memory=new Uint8Array(memSize);
+      ptr=0; pc=0; steps=0; inputBuffer=''; outputBuffer=''; outputEl.innerText='';
+    }
+    updateAllCells(); updateStatus();
+  }
+
+  function updateStatus(){
+    pcInfo.innerText='PC: '+pc;
+    stepsEl.innerText=steps;
+    currCmdEl.innerText = program[pc] || '—';
+  }
+
+  function executeStep(){
+    if(pc<0 || pc>=program.length) { stop(); return; }
+    const cmd=program[pc];
+    switch(cmd){
+      case '>': ptr++; if(ptr>=memory.length){ if(wrapPtrEl.checked) ptr=0; else { ptr = memory.length-1; } } break;
+      case '<': ptr--; if(ptr<0){ if(wrapPtrEl.checked) ptr=memory.length-1; else { ptr=0; } } break;
+      case '+': memory[ptr] = (memory[ptr]+1)&255; break;
+      case '-': memory[ptr] = (memory[ptr]-1)&255; break;
+      case '.': outputBuffer += String.fromCharCode(memory[ptr]); outputEl.innerText = outputBuffer; break;
+      case ',':
+        if(inputBuffer.length>0){ memory[ptr] = inputBuffer.charCodeAt(0) & 255; inputBuffer = inputBuffer.slice(1); }
+        else memory[ptr]=0; break;
+      case '[':
+        if(memory[ptr]===0) pc = bracketMap[pc];
+        break;
+      case ']':
+        if(memory[ptr]!==0) pc = bracketMap[pc];
+        break;
+    }
+    pc++; steps++;
+    updateAllCells(); updateStatus();
+    if(pc>=program.length) stop();
+  }
+
+  function start(){
+    if(running) return;
+    try{
+      const prep=preprocess(codeEl.value);
+      program = prep.filtered;
+      bracketMap = prep.map;
+    }catch(e){ alert('Parse error: '+e.message); return; }
+    inputBuffer = inputEl.value || '';
+    running=true;
+    const delay=parseInt(speedRange.value,10)||60;
+    timer = setInterval(()=>{
+      // perform several ops per tick depending on delay to keep smoothness
+      executeStep();
+    }, delay);
+    runBtn.disabled=true; pauseBtn.disabled=false; stepBtn.disabled=true;
+  }
+  function stop(){
+    running=false; if(timer) { clearInterval(timer); timer=null; }
+    runBtn.disabled=false; pauseBtn.disabled=true; stepBtn.disabled=false;
+  }
+
+  // Buttons
+  runBtn.addEventListener('click',()=>{
+    start();
+  });
+  pauseBtn.addEventListener('click',()=>{
+    stop();
+  });
+  stepBtn.addEventListener('click',()=>{
+    try{
+      if(!program){ const prep=preprocess(codeEl.value); program=prep.filtered; bracketMap=prep.map; }
+    }catch(e){ alert('Parse error: '+e.message); return; }
+    if(pc>=program.length) { pc=0; }
+    executeStep();
+  });
+  resetBtn.addEventListener('click',()=>{
+    stop(); reset(false);
+  });
+
+  speedRange.addEventListener('input',()=>{ speedVal.innerText=speedRange.value; if(running){ clearInterval(timer); timer=setInterval(executeStep, parseInt(speedRange.value,10)); } });
+
+  // allow clicking to edit cell values with shift+click to increment/decrement
+  gridEl.addEventListener('click',(e)=>{
+    const cell = e.target.closest('.cell');
+    if(!cell) return;
+    const idx = Number(cell.dataset.index);
+    if(e.shiftKey){ memory[idx]=(memory[idx]-1)&255; }
+    else if(e.altKey){ memory[idx]=(memory[idx]+1)&255; }
+    else { ptr=idx; }
+    updateAllCells(); updateStatus();
+  });
+
+  // keyboard shortcuts
+  document.addEventListener('keydown',(e)=>{
+    if(e.key===' ' && e.target.tagName!=='INPUT' && e.target.tagName!=='TEXTAREA'){
+      e.preventDefault(); if(running) stop(); else start();
+    }
+  });
+
+  // initial build
+  makeGrid(); updateStatus();
+
+})();
+</script>
+</body>
+</html>
+
