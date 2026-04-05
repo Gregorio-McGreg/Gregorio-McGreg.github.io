@@ -1,0 +1,107 @@
+<style>
+    .box {
+        width: 300px;             
+        border: 2px solid black;  
+        padding: 20px;            
+        margin: 10px;             
+        background-color: #f4f4f4;
+    }
+</style>
+
+<script>
+    let answer1 = undefined;
+    let answer2 = undefined;
+    
+    function resetAll() {
+        let title = document.getElementById('title');
+        let explainer = document.getElementById('explainer');
+        let dropdown = document.getElementById('answer');
+        let next = document.getElementById('next');
+
+        answer1 = undefined;
+        answer2 = undefined;
+        dropdown.hidden = false;
+        next.hidden = false;
+        
+        next.textContent = 'next >>';
+        next.setAttribute('onclick', 'next()');
+        dropdown.value = "yes"
+        title.textContent = 'Person 1:';
+        explainer.textContent = 'Pass this device to the first person. Once the first person has the device, tell them to select "yes" or "no" from the dropdown menu.';
+    }
+    
+    function next() {
+        let title = document.getElementById('title');
+        let explainer = document.getElementById('explainer');
+        let dropdown = document.getElementById('answer');
+        let next = document.getElementById('next');
+        
+        if (dropdown.value === "yes") {
+            answer1 = true;
+        } else if (dropdown.value === "no") {
+            answer1 = false;
+        }
+        
+        dropdown.value = "yes"
+        next.textContent = 'finish';
+        next.setAttribute('onclick', 'finish()');
+        title.textContent = 'Person 2:';
+        explainer.textContent = 'Pass this device to the second person. Once the second person has the device, tell them to select "yes" or "no" from the dropdown menu.';
+    }
+    
+    function finish() {
+        let title = document.getElementById('title');
+        let explainer = document.getElementById('explainer');
+        let dropdown = document.getElementById('answer');
+        let next = document.getElementById('next');
+        
+        if (dropdown.value === "yes") {
+            answer2 = true;
+        } else if (dropdown.value === "no") {
+            answer2 = false;
+        }
+        
+        title.textContent = 'Result:';
+        explainer.textContent = 'When you click the "see result" button, the result will be displayed. It will only be yes if you both selected yes. Otherwise, it will be no.';
+        next.textContent = 'see result >>';
+        next.setAttribute('onclick', 'result()');
+        dropdown.hidden = true;
+    }
+    
+    function result() {
+        let explainer = document.getElementById('explainer');
+        let next = document.getElementById('next');
+        if (answer1 && answer2) {
+            explainer.textContent = 'YES!!!!!!';
+        } else {
+            explainer.textContent = 'no';
+        }
+        next.hidden = true;
+    }
+</script>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>2yes</title>
+    <link rel="icon" href="https://www.stuff.tv/wp-content/uploads/sites/2/2023/09/OVERLAY-editors-choice-logo.png" type="image/png">
+</head>
+<body>
+    <a href="https://gregorio-mcgreg.github.io/" class="button">go home</a>
+    <h1>2yes</h1>
+    <p>This is a program that will ask two people to say either yes or no (secretly).<br>This program will always output no, unless both people say yes.<br>You can use this
+        for talking about things while staying secret.<br>(If you don't trust your friends, use this :) )</p>
+    <div class="box">
+        <button onclick="resetAll()">reset all</button>
+        <h3 id="title">Person 1:</h3>
+        <p id="explainer">Pass this device to the first person. Once the first person has the device, tell them to select "yes" or "no" from the dropdown menu.</p>
+        <select id="answer">
+            <option value="yes">yes</option>
+            <option value="no">no</option>
+        </select>
+        <br><br>
+        <button id="next" onclick="next()">next >></button>
+    </div>
+</body>
+</html>
