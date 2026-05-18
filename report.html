@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<style>
+body {
+position: absolute;
+left: 50%;
+transform: translate(-50%, 0%);
+width: 50vh
+}
+.box {
+background-color: lightblue;
+border: 2px solid black;
+padding: 10px;
+}
+h2 {
+text-align: center
+}
+</style>
+<head>
+  <title>Exlusivity Reporter</title>
+  <link rel="icon" href="https://www.stuff.tv/wp-content/uploads/sites/2/2023/09/OVERLAY-editors-choice-logo.png" type="image/png">
+</head>
+<body>
+<a href="https://gregorio-mcgreg.github.io/" class="button">go home</a>
+<h1>Exclusivity Reporter</h1>
+<p>This website is completely anonymous, meaning you can report anybody who has wronged you without them finding out.</p>
+
+<div class="box">
+<h2>Fill out this form to file a report</h2>
+<form action="/submit-data" method="post">
+	<label for="name">Who you'd like to report:</label>
+  <input type="text" id="name" name="name" placeholder="ex: Bob Smith, Bill Joe">
+  <br>
+  <label for="follow-up">Would you like a follow-up meeting?</label>
+  <br>
+  <select name="follow-up">
+  <option>no</option>
+  <option>yes</option>
+  </select>
+  <br>
+  <label for="email">Email: (only fill this out if you'd like a follow-up)</label>
+  <br>
+  <input type="text" id="email" name="email" placeholder="ex: CBBilzor@mcdonogh.org">
+  <br>
+  </input>
+  <br>
+  <input type="submit" value="Submit">
+</form>
+</div>
+
+</body>
+</html>
